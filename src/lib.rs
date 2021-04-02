@@ -42,6 +42,9 @@ pub struct Board {
     /// The buttons on the Adafruit nrf52840 Express board
     pub buttons: Buttons,
 
+    /// The external SPI interface
+    pub ext_spi: Spim<nrf52::SPIM0>,
+
     /// Core peripheral: Cache and branch predictor maintenance operations
     pub CBP: nrf52::CBP,
 
@@ -98,9 +101,6 @@ pub struct Board {
 
     /// nRF52 peripheral: UART0
     pub UART0: nrf52::UART0,
-
-    /// nRF52 peripheral: SPIM0
-    pub SPIM0: nrf52::SPIM0,
 
     /// nRF52 peripheral: SPIS0
     pub SPIS0: nrf52::SPIS0,
@@ -317,10 +317,23 @@ impl Board {
             UartBaudrate::BAUD115200,
         );
 
+        let ext_spi = Spim::new(
+            p.SPIM0,
+            spim::Pins {
+                sck: pins0.p0_14.into_push_pull_output(Level::Low).degrade(),
+                mosi: Some(pins0.p0_13.into_push_pull_output(Level::Low).degrade()),
+                miso: Some(pins0.p0_15.into_floating_input().degrade())
+            },
+            Frequency::K500,
+            MODE_0,
+            0,
+        );
+
         Board {
             cdc: cdc_uart,
             flash: flash_spim,
             flash_cs: flash_cs,
+            ext_spi: ext_spi,
 
             pins: Pins {
                 _RESET: pins0.p0_18,
@@ -330,9 +343,6 @@ impl Board {
                 a3: pins0.p0_28,
                 a4: pins0.p0_02,
                 a5: pins0.p0_03,
-                sck: pins0.p0_14,
-                mosi: pins0.p0_13,
-                miso: pins0.p0_15,
                 scl: pins0.p0_11,
                 sda: pins0.p0_12,
                 d2: pins0.p0_10,
@@ -377,7 +387,6 @@ impl Board {
             RADIO: p.RADIO,
 
             UART0: p.UART0,
-            SPIM0: p.SPIM0,
             SPIS0: p.SPIS0,
             TWIM0: p.TWIM0,
             TWIS0: p.TWIS0,
@@ -442,9 +451,6 @@ pub struct Pins {
     pub a3: p0::P0_28<Disconnected>,
     pub a4: p0::P0_02<Disconnected>,
     pub a5: p0::P0_03<Disconnected>,
-    pub sck: p0::P0_14<Disconnected>,
-    pub mosi: p0::P0_13<Disconnected>,
-    pub miso: p0::P0_15<Disconnected>,
     pub scl: p0::P0_11<Disconnected>,
     pub sda: p0::P0_12<Disconnected>,
     pub d2: p0::P0_10<Disconnected>,
