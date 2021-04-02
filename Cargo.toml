@@ -1,0 +1,27 @@
+[package]
+name = "adafruit-nrf52840-express"
+version = "0.0.1"
+authors = ["Christopher Conroy <39525900+cbc02009@users.noreply.github.com>"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+keywords = ["arm", "cortex-m", "nrf52", "hal"]
+categories = ["embedded", "hardware-support", "no-std"]
+description = "BSP for the Adafruit Feather nrf52840 Express"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cortex-m = "0.7"
+cortex-m-rt = "0.6"
+nrf52840-hal = "0.12"
+embedded-hal = "0.2"
+
+[dev-dependencies]
+cortex-m-rt = "0.6"
+nb = "~0.1"
+panic-semihosting = "~0.5"
+panic-rtt-target = {version = "0.1.1", features = ["cortex-m"]}
+
+[features]
+rt = ["nrf52840-hal/rt"]
+default = ["rt"]
