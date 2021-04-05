@@ -21,7 +21,7 @@ use nrf52840_hal::{
     uarte::{self, Baudrate as UartBaudrate, Parity as UartParity, Uarte},
 };
 
-use embedded_hal::digital::v2::{InputPin, OutputPin};
+use embedded_hal::digital::v2::{InputPin, OutputPin, StatefulOutputPin};
 
 /// Provides access to all features of the Adafruit nrf52840 Express board
 #[allow(non_snake_case)]
@@ -468,19 +468,30 @@ pub struct Led(Pin<Output<PushPull>>);
 
 impl Led {
     fn new<Mode>(pin: Pin<Mode>) -> Self {
-        Led(pin.into_push_pull_output(Level::High))
+        Led(pin.into_push_pull_output(Level::Low))
     }
 
     /// Enable the LED
     pub fn enable(&mut self) {
-        self.0.set_low().unwrap()
+        self.0.set_high().unwrap()
     }
 
     /// Disable the LED
     pub fn disable(&mut self) {
-        self.0.set_high().unwrap()
+        self.0.set_low().unwrap()
     }
+
+    pub fn is_on(&self) -> bool {
+        self.0.is_set_high().unwrap()
+    }
+
+    pub fn is_off(&self) -> bool {
+        self.0.is_set_low().unwrap()
+    }
+
 }
+
+
 
 /// The Buttons on the Adafruit nrf52840 Express board
 pub struct Buttons {
